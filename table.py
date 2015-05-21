@@ -46,10 +46,10 @@ class Table(object):
 
         assert self.is_empty(), 'Only empty Table objects can open files'
         
-        csvFile = open(filename, 'rU', encoding='utf-8', errors='replace')
-        csvFile = csv.reader(csvFile)
+        csv_file = open(filename, 'rU', encoding='utf-8', errors='replace')
+        csv_file = csv.reader(csv_file)
         i = 0
-        for row in csvFile:
+        for row in csv_file:
             if i == 0:
                 self.header = row
                 i += 1
@@ -58,15 +58,15 @@ class Table(object):
             
         self.set_table()
 
-    def load_from_database_table(self, databaseTable):
+    def load_from_database_table(self, database_table):
         """ Loads data from a MySQL table contained in a DatabaseTable
         object.
         """
         assert self.is_empty(), 'Only empty Table objects can load from a database'
-        #assert isinstance(databaseTable, stctools.DatabaseTable), 'databaseTable must be instance of stctools.DatabaseTable'
+        #assert isinstance(database_table, stctools.DatabaseTable), 'database_table must be instance of stctools.DatabaseTable'
         
-        self.header = databaseTable.get_columns()
-        data = databaseTable.getAll()
+        self.header = database_table.get_columns()
+        data = database_table.getAll()
         for row in data:
             self.rows.append(TableRow(row, self.header))
 
@@ -94,15 +94,15 @@ class Table(object):
     def set_columns(self):
         """ Creates a 2d list pivoted from self.rows.  """
         self.columns = []
-        columnNumber=0
+        column_number=0
         for column in self.header:
             thisColumn = []
             rowNumber=0
             for row in self.rows:
-                thisColumn.append(self.rows[rowNumber][columnNumber])
+                thisColumn.append(self.rows[rowNumber][column_number])
                 rowNumber += 1
             self.columns.append(thisColumn)
-            columnNumber += 1
+            column_number += 1
 
     def set_table(self):
         self.set_headers()
