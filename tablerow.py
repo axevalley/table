@@ -30,7 +30,7 @@ class TableRow(object):
     def __len__(self):
         return len(self.row)
 
-    def column(self, column):
+    def get_column(self, column):
         """ Returns the value held in the specified column.  """
         return self.row[self.headers[column]]
 
