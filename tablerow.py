@@ -25,7 +25,7 @@ class TableRow(object):
             return self.row[self.headers[index]]
 
     def __str__(self):
-        return self.toArray()
+        return self.to_array()
 
     def __len__(self):
         return len(self.row)
@@ -34,7 +34,7 @@ class TableRow(object):
         """ Returns the value held in the specified column.  """
         return self.row[self.headers[column]]
 
-    def removeColumn(self, column):
+    def remove_column(self, column):
         """ Removes the specified column.  """
         if column in self.header:
             columnIndex = self.header.index(column)
@@ -43,6 +43,6 @@ class TableRow(object):
         else:
             return False
 
-    def toArray(self):
+    def to_array(self):
         """ Returns the data row as a list object.  """
         return self.row
