@@ -192,6 +192,6 @@ class Table(object):
         writer = csv.writer(file)
         writer.writerow(self.header)
         for row in self:
-            writer.writerow(row.toArray())
+            writer.writerow(row.to_array())
         file.close()
         print('Writen ' + str(len(self.rows)) + ' lines to file ' + filename)
