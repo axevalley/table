@@ -17,7 +17,7 @@ class Table(object):
         self.empty()
 
         if isinstance(filename, str):
-            self.openFile(filename)
+            self.open_file(filename)
     
 
     def __len__(self):
@@ -36,7 +36,7 @@ class Table(object):
         total = str(len(self.columns) * len(self.rows))
         return 'CsvFile Object containing ' + columns + ' colomuns and ' + rows + ' rows. ' + total + ' total entries.'
 
-    def openFile(self, filename):
+    def open_file(self, filename):
         """ Creates Table object from a .csv file. This file must be
         comma separated and utf-8 encoded. The first row must contain
         column headers.
@@ -44,7 +44,7 @@ class Table(object):
         If the object already contains date it will be overwritten.
         """
 
-        assert self.isEmpty(), 'Only empty Table objects can open files'
+        assert self.is_empty(), 'Only empty Table objects can open files'
         
         csvFile = open(filename, 'rU', encoding='utf-8', errors='replace')
         csvFile = csv.reader(csvFile)
@@ -56,21 +56,21 @@ class Table(object):
             else:
                 self.rows.append(TableRow(row, self.header))
             
-        self.setTable()
+        self.set_table()
 
-    def loadFromDatabaseTable(self, databaseTable):
+    def load_from_database_table(self, databaseTable):
         """ Loads data from a MySQL table contained in a DatabaseTable
         object.
         """
-        assert self.isEmpty(), 'Only empty Table objects can load from a database'
+        assert self.is_empty(), 'Only empty Table objects can load from a database'
         #assert isinstance(databaseTable, stctools.DatabaseTable), 'databaseTable must be instance of stctools.DatabaseTable'
         
-        self.header = databaseTable.getColumns()
+        self.header = databaseTable.get_columns()
         data = databaseTable.getAll()
         for row in data:
             self.rows.append(TableRow(row, self.header))
 
-        self.setTable()
+        self.set_table()
 
     def empty(self):
         """ Clears all data from the Table. The same as initialising a
@@ -82,7 +82,7 @@ class Table(object):
         self.columns = []
         self.headers = {}
 
-    def setHeaders(self):
+    def set_headers(self):
         """ Creates a dictionary of headers for looking up the
         apropriate index in self.columns.
         """
@@ -91,7 +91,7 @@ class Table(object):
         for column in self.header:
             self.headers[column] = self.header.index(column)
 
-    def setColumns(self):
+    def set_columns(self):
         """ Creates a 2d list pivoted from self.rows.  """
         self.columns = []
         columnNumber=0
@@ -104,12 +104,12 @@ class Table(object):
             self.columns.append(thisColumn)
             columnNumber += 1
 
-    def setTable(self):
-        self.setHeaders()
-        self.setColumns()            
+    def set_table(self):
+        self.set_headers()
+        self.set_columns()            
     
 
-    def isEmpty(self):
+    def is_empty(self):
         """ Returns True if the table conatins no data, otherwise
         returns False.
         """
@@ -130,25 +130,25 @@ class Table(object):
         if isinstance(row, list):
             assert len(row) == len(self.header), 'New Row must have correct number of entries'
             self.rows.append(TableRow(row, self.header))
-            self.setTable()
+            self.set_table()
         elif isinstance(row, TableRow):
             assert row.header == self.header, 'New Row must have correct header'
             self.rows.append(row)
 
-    def getColumn(self, column):
+    def get_column(self, column):
         """ Returns a list containing all values from the specified
         column.
         """
         
         return self.columns[self.headers[column]]
 
-    def removeColumn(self, column):
+    def remove_column(self, column):
         """ Removes a specified column from the Table.  """
         if column in self.header:
             for row in self.rows:
-                row.removeColumn(column)                
-            self.setHeaders()
-            self.setColumns()
+                row.remove_column(column)                
+            self.set_headers()
+            self.set_columns()
             print('DELETED column: ' + column)
         else:
             return False
@@ -156,12 +156,12 @@ class Table(object):
     def getRows(self):
         return self.rows
 
-    def loadFromArray(self, data, header):
+    def load_from_array(self, data, header):
         """ Loads the Table with data contained in a 2d list
         object.
         """
 
-        assert self.isEmpty(), 'Only empty Table objects can open files'
+        assert self.is_empty(), 'Only empty Table objects can open files'
         assert isinstance(header, list), 'header must be list containing column headers'
         assert isinstance(data, list), 'data must be list'
         for row in data:
@@ -180,7 +180,7 @@ class Table(object):
             else:
                 self.rows.append(TableRow(row, header))
 
-        self.setTable()
+        self.set_table()
 
     def write(self, filename):
         """ Creates a .csv of the data contained within the Table with
