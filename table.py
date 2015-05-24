@@ -199,6 +199,8 @@ class Table(object):
     def to_html(self, header=True):
         """ Returns a string containg the data held in the Table as
         as html table.
+        If header=True the column headings will be included in <th>
+        tags. If it is False no headings will be written.
         """
         open_table = '<table>\n'
         close_table = '</table>\n'
@@ -228,3 +230,7 @@ class Table(object):
         html_table += close_table
             
         return html_table
+    
+    def to_html_file(self):
+        pass
+    
