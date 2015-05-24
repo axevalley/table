@@ -231,6 +231,9 @@ class Table(object):
             
         return html_table
     
-    def to_html_file(self):
-        pass
+    def to_html_file(self, filename, header=True):
+        html_file = open(filename, 'w', encoding='utf-8')
+        html_file.write(self.to_html(header=header))
+        html_file.close()
+        
     
