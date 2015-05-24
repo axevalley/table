@@ -195,3 +195,36 @@ class Table(object):
             writer.writerow(row.to_array())
         file.close()
         print('Writen ' + str(len(self.rows)) + ' lines to file ' + filename)
+        
+    def to_html(self, header=True):
+        """ Returns a string containg the data held in the Table as
+        as html table.
+        """
+        open_table = '<table>\n'
+        close_table = '</table>\n'
+        open_tr = '\t<tr>\n'
+        close_tr = '\t</tr>\n'
+        open_th = '\t\t<th>'
+        close_th = '</th>\n'
+        open_td = '\t\t<td>'
+        close_td = '</td>\n'
+        
+        html_table = ''
+        html_table += open_table
+        if header == True:
+            html_table += open_tr
+            for head in self.header:
+                html_table += open_th
+                html_table += head
+                html_table += close_th
+            html_table += close_tr
+        for row in self.rows:
+            html_table += open_tr
+            for cell in row:
+                html_table += open_th
+                html_table += cell
+                html_table += close_th
+            html_table += close_tr
+        html_table += close_table
+            
+        return html_table
