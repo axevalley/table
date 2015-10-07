@@ -236,4 +236,65 @@ class Table(object):
         html_file.write(self.to_html(header=header))
         html_file.close()
         
+    def print_r(self):
+        for row in self.rows:
+            print(row.row)
+    
+    def copy(self):
+        new_table = Table()
+        new_table.header = self.header
+        for row in self.rows:
+            new_table.rows.append(row.copy())
+        new_table.set_table()
+        return new_table
+        
+    def sort(self, sort_key, asc=True):
+        if type(sort_key) == str:
+            if sort_key in self.header:
+                column = self.header.index(sort_key)
+            else:
+                raise KeyError('sort_key must be int or in header')
+        else:
+            column = sort_key
+        try:
+            self.rows.sort(key = lambda x: float(x.row[column]), reverse = not asc)
+        except ValueError:
+            self.rows.sort(key = lambda x: x.row[column], reverse = not asc)
+            
+    def sorted(self, sort_key, asc=True):
+        temp_table = self.copy()
+        temp_table.sort(sort_key, asc)
+        return temp_table
+            
+    def multi_sort(self, *sort_keys):
+        sort_keys = reversed(sort_keys)
+        for sort_pair in sort_keys:
+            if type(sort_pair) in (str, int):
+                sort_key = sort_pair
+                self.sort(sort_key)
+            elif type(sort_pair) in (list, tuple):
+                sort_key, sort_direction = sort_pair
+                if type(sort_key) not in (int, str):
+                    raise TypeError('sort_key Must be int')
+                if sort_key not in self.header:
+                    raise KeyError('sort_key must be in header')
+                if type(sort_direction) == str:
+                    if sort_direction.upper() not in ('A', 'ASC', 'ASCENDING', 'D', 'DESC', 'DESCENDING'):
+                        raise Exception("sort_direction must be one of 'A', 'ASC', 'ASCENDING', 'D', 'DESC', 'DESCENDING'")
+                elif type(sort_direction) != bool:
+                    raise TypeError('sort_direction must be str or bool')
+                if type(sort_direction) == str:
+                    if sort_direction in ('A', 'ASC', 'ASCENDING'):
+                        asc = True
+                    elif sort_direction in ('D', 'DESC', 'DESCENDING'):
+                        asc = False
+                self.sort(sort_key, asc)
+                
+            else:
+                raise TypeError('sort_keys must be int, str, list or tuple. Not ' + str(type(sort_pair)))
+    
+    def multi_sorted(self,*sort_keys):
+        temp_table = self.copy()
+        temp_table.multi_sort(*sort_keys)
+        return temp_table
     

@@ -25,7 +25,10 @@ class TableRow(object):
             return self.row[self.headers[index]]
 
     def __str__(self):
-        return self.to_array()
+        new_string = ""
+        for item in self.to_array():
+            new_string = new_string + "'" + item + "', "
+        return new_string [0:-2]
 
     def __len__(self):
         return len(self.row)
@@ -46,3 +49,7 @@ class TableRow(object):
     def to_array(self):
         """ Returns the data row as a list object.  """
         return self.row
+    
+    def copy(self):
+        return TableRow(self.row, self.header)
+    
