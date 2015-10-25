@@ -66,7 +66,7 @@ class Table(object):
         #assert isinstance(database_table, stctools.DatabaseTable), 'database_table must be instance of stctools.DatabaseTable'
         
         self.header = database_table.get_columns()
-        data = database_table.getAll()
+        data = database_table.get_all()
         for row in data:
             self.rows.append(TableRow(row, self.header))
 
