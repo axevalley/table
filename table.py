@@ -11,7 +11,6 @@ class Table(object):
     """ Container for tabulated data. Can be created from a .csv by
     passing the file path to __init__.
     """
-
     def __init__(self, filename=None):
         self.empty()
 
