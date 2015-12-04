@@ -220,14 +220,14 @@ class Table(object):
             html_table += open_tr
             for head in self.header:
                 html_table += open_th
-                html_table += head
+                html_table += str(head)
                 html_table += close_th
             html_table += close_tr
         for row in self.rows:
             html_table += open_tr
             for cell in row:
                 html_table += open_td
-                html_table += cell
+                html_table += str(cell)
                 html_table += close_td
             html_table += close_tr
         html_table += close_table
