@@ -24,6 +24,12 @@ class TableRow(object):
         elif type(index) == str:
             return self.row[self.headers[index]]
 
+    def __setitem__(self, key, item):
+        if type(key) == int:
+            self.row[key] = str(item)
+        elif type(key) == str:
+            self.row[self.headers[key]] = str(item)
+
     def __str__(self):
         new_string = ""
         for item in self.to_array():
