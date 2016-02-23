@@ -37,6 +37,9 @@ class TableRow(object):
         """ Returns the value held in the specified column.  """
         return self.row[self.headers[column]]
 
+    def update_column(self, column, value):
+        self.row[self.headers[column]] = str(value)
+
     def remove_column(self, column):
         """ Removes the specified column.  """
         if column in self.header:
