@@ -45,8 +45,8 @@ class Table(object):
 
         assert self.is_empty(), 'Only empty Table objects can open files'
 
-        csv_file = open(filename, 'rU', encoding='utf-8', errors='replace')
-        csv_file = csv.reader(csv_file)
+        open_file = open(filename, 'rU', encoding='utf-8', errors='replace')
+        csv_file = csv.reader(open_file)
         i = 0
         for row in csv_file:
             if i == 0:
@@ -54,7 +54,7 @@ class Table(object):
                 i += 1
             else:
                 self.rows.append(TableRow(row, self.header))
-
+        open_file.close()
         self.set_table()
 
     def load_from_database_table(self, database_table):
@@ -312,3 +312,12 @@ class Table(object):
         temp_table = self.copy()
         temp_table.multi_sort(*sort_keys)
         return temp_table
+
+    def split_by_row_count(self, row_count):
+        split_tables = []
+        for i in range(0, len(self.rows), row_count):
+            new_table = Table()
+            new_table.header = self.header
+            new_table.rows = self.rows[i:i + row_count]
+            split_tables.append(new_table)
+        return split_tables
