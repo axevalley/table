@@ -11,11 +11,16 @@ class Table(object):
     """ Container for tabulated data. Can be created from a .csv by
     passing the file path to __init__.
     """
-    def __init__(self, filename=None):
+    def __init__(
+            self, filename=None, header=None, data=None, encoding='utf-8'):
         self.empty()
 
         if isinstance(filename, str):
-            self.open_file(filename)
+            self.open_file(filename, encoding=encoding)
+        if isinstance(header, list):
+            self.header = header
+        if isinstance(data, list):
+            self.load_from_array(data, self.header)
 
     def __len__(self):
         return len(self.rows)
@@ -35,7 +40,7 @@ class Table(object):
         string = string + rows + ' rows. ' + total + ' total entries.'
         return string
 
-    def open_file(self, filename):
+    def open_file(self, filename, encoding='utf-8'):
         """ Creates Table object from a .csv file. This file must be
         comma separated and utf-8 encoded. The first row must contain
         column headers.
