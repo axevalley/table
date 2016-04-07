@@ -3,6 +3,7 @@
 # Table by Luke Shiner (luke@lukeshiner.com)
 
 import csv
+import requests
 
 from . tablerow import TableRow
 
@@ -12,11 +13,14 @@ class Table(object):
     passing the file path to __init__.
     """
     def __init__(
-            self, filename=None, header=None, data=None, encoding='utf-8'):
+            self, filename=None, url=None, header=None, data=None,
+            encoding='utf-8'):
         self.empty()
-
+        self.encoding = encoding
         if isinstance(filename, str):
             self.open_file(filename, encoding=encoding)
+        elif url is not None:
+            self.open_url(url)
         if isinstance(header, list):
             self.header = header
         if isinstance(data, list):
@@ -40,7 +44,7 @@ class Table(object):
         string = string + rows + ' rows. ' + total + ' total entries.'
         return string
 
-    def open_file(self, filename, encoding='utf-8'):
+    def open_file(self, filename, encoding=None):
         """ Creates Table object from a .csv file. This file must be
         comma separated and utf-8 encoded. The first row must contain
         column headers.
@@ -49,9 +53,23 @@ class Table(object):
         """
 
         assert self.is_empty(), 'Only empty Table objects can open files'
-
-        open_file = open(filename, 'rU', encoding='utf-8', errors='replace')
+        if encoding is None:
+            encoding = self.encoding
+        open_file = open(filename, 'rU', encoding=self.encoding, errors='replace')
         csv_file = csv.reader(open_file)
+        self.load_file(csv_file)
+        open_file.close()
+
+    def open_url(self, url):
+        request = requests.get(url)
+        text = []
+        for line in request.iter_lines():
+            if len(line) > 0:
+                text.append(line.decode(self.encoding))
+        csv_file = csv.reader(text)
+        self.load_file(csv_file)
+
+    def load_file(self, csv_file):
         i = 0
         for row in csv_file:
             if i == 0:
@@ -59,7 +77,6 @@ class Table(object):
                 i += 1
             else:
                 self.rows.append(TableRow(row, self.header))
-        open_file.close()
         self.set_table()
 
     def load_from_database_table(self, database_table):
@@ -102,12 +119,12 @@ class Table(object):
         self.columns = []
         column_number = 0
         for column in self.header:
-            thisColumn = []
-            rowNumber = 0
+            this_column = []
+            row_number = 0
             for row in self.rows:
-                thisColumn.append(self.rows[rowNumber][column_number])
-                rowNumber += 1
-            self.columns.append(thisColumn)
+                this_column.append(self.rows[row_number].row[column_number])
+                row_number += 1
+            self.columns.append(this_column)
             column_number += 1
 
     def set_table(self):
