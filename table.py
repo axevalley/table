@@ -208,7 +208,7 @@ class Table(object):
 
         self.set_table()
 
-    def write(self, filename):
+    def write_csv(self, filename):
         """ Creates a .csv of the data contained within the Table with
         the specifed filename or filepath.
         This file will be comma separated and UTF-8 encoded.
@@ -221,6 +221,18 @@ class Table(object):
             writer.writerow(row.to_array())
         file.close()
         print('Writen ' + str(len(self.rows)) + ' lines to file ' + filename)
+
+    def write(self, filename):
+        self.write_csv(filename)
+
+    def write_ods(self, filename):
+        from collections import OrderedDict
+        from pyexcel_ods3 import save_data
+        data = OrderedDict()
+        sheet = [self.header]
+        sheet += self.rows
+        data.update({"Sheet 1": sheet})
+        save_data(filename, data)
 
     def to_html(self, header=True):
         """ Returns a string containg the data held in the Table as
