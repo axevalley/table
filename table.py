@@ -13,14 +13,12 @@ class Table(object):
     passing the file path to __init__.
     """
     def __init__(
-            self, filename=None, url=None, header=None, data=None,
+            self, filename=None, header=None, data=None,
             encoding='utf-8'):
         self.empty()
         self.encoding = encoding
         if isinstance(filename, str):
-            self.open_file(filename, encoding=encoding)
-        elif url is not None:
-            self.open_url(url)
+            self.open(filename)
         if isinstance(header, list):
             self.header = header
         if isinstance(data, list):
@@ -44,7 +42,17 @@ class Table(object):
         string = string + rows + ' rows. ' + total + ' total entries.'
         return string
 
-    def open_file(self, filename, encoding=None):
+    def is_url(self, url):
+        from urllib.parse import urlparse
+        return urlparse(url).scheme != ""
+
+    def parse_csv_file(self, csv_file):
+        rows = []
+        for row in csv_file:
+            rows.append(row)
+        return rows
+
+    def open(self, filename, encoding=None):
         """ Creates Table object from a .csv file. This file must be
         comma separated and utf-8 encoded. The first row must contain
         column headers.
@@ -53,22 +61,28 @@ class Table(object):
         """
 
         assert self.is_empty(), 'Only empty Table objects can open files'
-        open_csv(filename, encoding=self.encoding)
+        if self.is_url(filename):
+            self.open_url(filename)
+        elif filename.split('.')[-1].lower() == 'ods':
+            self.open_ods(filename)
+        else:
+            self.open_csv(filename)
 
-    def open_csv(filename, encoding=None):
+    def open_csv(self, filename, encoding=None):
         if encoding is None:
             encoding = self.encoding
         open_file = open(
             filename, 'rU', encoding=self.encoding, errors='replace')
         csv_file = csv.reader(open_file)
-        self.load_file(csv_file)
+        rows = self.parse_csv_file(csv_file)
+        self.load_file(rows)
         open_file.close()
 
     def open_ods(self, filename, sheet=0):
         import ezodf
         doc = ezodf.opendoc(filename)
         sheet = doc.sheets[sheet]
-        csv_file = []
+        rows = []
         for row in sheet:
             new_row = []
             for cell in row:
@@ -77,8 +91,8 @@ class Table(object):
                 else:
                     new_row.append('')
             if len(row) > 0:
-                csv_file.append(new_row)
-        self.load_file(csv_file[2:])
+                rows.append(new_row)
+        self.load_file(rows)
 
     def open_url(self, url):
         request = requests.get(url)
@@ -87,11 +101,12 @@ class Table(object):
             if len(line) > 0:
                 text.append(line.decode(self.encoding))
         csv_file = csv.reader(text)
-        self.load_file(csv_file)
+        rows = self.parse_csv_file(csv_file)
+        self.load_file(rows)
 
-    def load_file(self, csv_file):
-        self.header = csv_file[0]
-        for row in csv_file[1:]:
+    def load_file(self, rows):
+        self.header = rows[0]
+        for row in rows[1:]:
             self.rows.append(TableRow(row, self.header))
         self.set_table()
 
