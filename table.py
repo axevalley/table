@@ -53,12 +53,32 @@ class Table(object):
         """
 
         assert self.is_empty(), 'Only empty Table objects can open files'
+        open_csv(filename, encoding=self.encoding)
+
+    def open_csv(filename, encoding=None):
         if encoding is None:
             encoding = self.encoding
-        open_file = open(filename, 'rU', encoding=self.encoding, errors='replace')
+        open_file = open(
+            filename, 'rU', encoding=self.encoding, errors='replace')
         csv_file = csv.reader(open_file)
         self.load_file(csv_file)
         open_file.close()
+
+    def open_ods(self, filename, sheet=0):
+        import ezodf
+        doc = ezodf.opendoc(filename)
+        sheet = doc.sheets[sheet]
+        csv_file = []
+        for row in sheet:
+            new_row = []
+            for cell in row:
+                if cell.value is not None:
+                    new_row.append(cell.value)
+                else:
+                    new_row.append('')
+            if len(row) > 0:
+                csv_file.append(new_row)
+        self.load_file(csv_file[2:])
 
     def open_url(self, url):
         request = requests.get(url)
@@ -70,13 +90,9 @@ class Table(object):
         self.load_file(csv_file)
 
     def load_file(self, csv_file):
-        i = 0
-        for row in csv_file:
-            if i == 0:
-                self.header = row
-                i += 1
-            else:
-                self.rows.append(TableRow(row, self.header))
+        self.header = csv_file[0]
+        for row in csv_file[1:]:
+            self.rows.append(TableRow(row, self.header))
         self.set_table()
 
     def load_from_database_table(self, database_table):
