@@ -43,8 +43,13 @@ class Table(object):
         return string
 
     def is_url(self, url):
-        from urllib.parse import urlparse
-        return urlparse(url).scheme != ""
+        if url[0:7].lower() == 'http://':
+            return True
+        if url[0:8].lower() == 'https://':
+            return True
+        if url[0:6].lower() == 'ftp://':
+            return True
+        return False
 
     def parse_csv_file(self, csv_file):
         rows = []
@@ -264,6 +269,7 @@ class Table(object):
         sheet += self.rows
         data.update({"Sheet 1": sheet})
         save_data(filename, data)
+        print('Writen ' + str(len(self.rows)) + ' lines to file ' + filename)
 
     def to_html(self, header=True):
         """ Returns a string containg the data held in the Table as
